@@ -21,28 +21,24 @@
 # If no, download and start
 
 
-if docker ps --format '{{.Names}}'| grep -q esdb;
-then echo -e '\nesdb docker container appears to be running\n';
+if docker ps -a --format '{{.Names}}'| grep -q esdb;
+then 
+       echo -e '\nesdb docker container appears to be running\n';
 
-#docker ps --format '{{.Names}}'
+       # Kill the container
+       docker stop esdb-node
 
-# The following steps work
+       ## Remove the instance
+       docker rm esdb-node
 
-# 1 kill the container
-
-docker stop esdb-node
-
-## Remove the instance
-docker rm esdb-node
-
-docker run -d --name esdb-node -it -p 2113:2113 -p 1113:1113 \
-       eventstore/eventstore:lts --insecure --run-projections=All \
-       --enable-external-tcp --enable-atom-pub-over-http
+       docker run -d --name esdb-node -it -p 2113:2113 -p 1113:1113 \
+              eventstore/eventstore:lts --insecure --run-projections=All \
+              --enable-external-tcp --enable-atom-pub-over-http
 
 else
-    docker run -d --name esdb-node -it -p 2113:2113 -p 1113:1113 \
-	   eventstore/eventstore:lts --insecure --run-projections=All \
-	  --enable-external-tcp --enable-atom-pub-over-http
+       docker run -d --name esdb-node -it -p 2113:2113 -p 1113:1113 \
+              eventstore/eventstore:lts --insecure --run-projections=All \
+              --enable-external-tcp --enable-atom-pub-over-http
 fi
 
 

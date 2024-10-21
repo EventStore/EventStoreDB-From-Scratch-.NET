@@ -2,10 +2,13 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-in-docker
 {
 	"name": "quickstart",
-	"image": "mcr.microsoft.com/devcontainers/universal:2.8-focal",
 	"postCreateCommand": "sudo cp .devcontainer/quickstart/welcome.txt /usr/local/etc/vscode-dev-containers/first-run-notice.txt",
+	
 	"containerEnv": {
 		"DOTNET_NOLOGO": "true" // Mute dotnet welcome message that appears when dotnet is executed for the first time https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-environment-variables#dotnet_nologo
+	},
+	"features": {
+	    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
 	"portsAttributes": {
 		"2113": {

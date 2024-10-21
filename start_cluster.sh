@@ -14,7 +14,7 @@
 # grep -q is search in silent mode to prevent output to the terminal
 # echo -e the -e allows echo of newline characters
 #######
-
+echo "Starting EventStoreDB docker container..."
 
 # Function to check if Docker daemon is running by checking the output of 'docker ps'
 check_docker() {

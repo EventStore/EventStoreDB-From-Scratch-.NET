@@ -25,6 +25,8 @@ check_docker() {
 if ! check_docker; then
        echo "Docker daemon is not running. Awaiting for it to start..."
        # If Docker daemon is not available, start retry loop
+       max_attempts=10
+       attempt=0
        while ! check_docker; do
               attempt=$((attempt+1))
               if [ $attempt -ge $max_attempts ]; then

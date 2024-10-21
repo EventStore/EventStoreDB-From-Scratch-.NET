@@ -33,6 +33,10 @@ if ! check_docker; then
                      echo "Docker daemon is still not available. Exiting"
                      exit 1
               fi
+              echo "Retrying... (Attempt $attempt of $max_attempts)"
+              echo "$attempt" -ge "$max_attempts"
+              echo [ "$attempt" -ge "$max_attempts" ];
+        
        done
        
        echo "Docker daemon is now running. Proceeding with the rest of the script..."

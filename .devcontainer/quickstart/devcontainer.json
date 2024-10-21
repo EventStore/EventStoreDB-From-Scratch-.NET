@@ -3,6 +3,13 @@
 {
 	"name": "quickstart",
 	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "latest",
+			"enableNonRootDocker": "true",
+			"moby": "true"
+		}
+	},
 	"postCreateCommand": "sudo cp .devcontainer/quickstart/welcome.txt /usr/local/etc/vscode-dev-containers/first-run-notice.txt",
 	"portsAttributes": {
 		"2113": {

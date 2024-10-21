@@ -3,6 +3,9 @@
 {
 	"name": "quickstart",
 	"postCreateCommand": "sudo cp .devcontainer/quickstart/welcome.txt /usr/local/etc/vscode-dev-containers/first-run-notice.txt",
+	"containerEnv": {
+		"DOTNET_NOLOGO": "true" // Mute dotnet welcome message that appears when dotnet is executed for the first time https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-environment-variables#dotnet_nologo
+	},
 	"portsAttributes": {
 		"2113": {
 			"label": "EventStoreDB Admin UI",

@@ -29,7 +29,7 @@ if ! check_docker; then
        attempt=0
        while ! check_docker; do
               attempt=$((attempt+1))
-              if [ $attempt -ge $max_attempts ]; then
+              if [ "$attempt" -ge "$max_attempts" ]; then
                      echo "Docker daemon is still not available. Exiting"
                      exit 1
               fi

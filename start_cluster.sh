@@ -16,11 +16,29 @@
 #######
 
 
+# Function to check if Docker daemon is running by checking the output of 'docker ps'
+check_docker() {
+  docker ps > /dev/null 2>&1
+}
+
+# Initial check before entering the loop
+if ! check_docker; then
+       echo "Docker daemon is not running. Awaiting for it to start..."
+       # If Docker daemon is not available, start retry loop
+       while ! check_docker; do
+              attempt=$((attempt+1))
+              if [ $attempt -ge $max_attempts ]; then
+                     echo "Docker daemon is still not available. Exiting"
+                     exit 1
+              fi
+       done
+       
+       echo "Docker daemon is now running. Proceeding with the rest of the script..."
+fi
+
 # Check to see if docker container is already running
 # If yes, kill it and restart
 # If no, download and start
-
-
 if docker ps -a --format '{{.Names}}'| grep -q esdb;
 then 
        echo -e '\nesdb docker container appears to be running\n';

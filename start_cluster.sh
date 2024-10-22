@@ -1,81 +1,95 @@
 #!/bin/bash
-####
+###########################################################
+#
 # Docker management script for Eventstore Training Classes
-#####
+#
+###########################################################
 
-####
-# Check to see if instance is currently running
-# If instance is running kill it and start fresh instance
-########
-
-#############
+#################################################################################
 # Some bash notes for the curious
-# ps --format returns just the names rather than the verbose table format
+# docker ps --format returns just the names rather than the verbose table format
 # grep -q is search in silent mode to prevent output to the terminal
 # echo -e the -e allows echo of newline characters
-#######
-echo "Starting EventStoreDB docker container..."
+#################################################################################
 
-# Function to check if Docker daemon is running by checking the output of 'docker ps'
-check_docker() {
-  docker ps > /dev/null 2>&1
-}
+echo "Starting EventStoreDB docker container. This can take a moment..."
 
-# Initial check before entering the loop
-if ! check_docker; then
-       echo "Docker daemon is not running. Awaiting for it to start..."
-       # If Docker daemon is not available, start retry loop
-       max_attempts=10
-       attempt=0
-       while ! check_docker; do
-              attempt=$((attempt+1))
-              if [ "$attempt" -ge "$max_attempts" ]; then
-                     echo "Docker daemon is still not available. Exiting"
-                     exit 1
-              fi
-              echo "Retrying... (Attempt $attempt of $max_attempts)"
-              sleep 5
-       done
-       
-       echo "Docker daemon is now running. Proceeding with the rest of the script..."
+##################################################
+#
+# Step 1. Wait for the docker service to start up
+#
+##################################################
+
+max_attempts=10
+attempt=0
+while ! docker ps > /dev/null 2>&1; do                                # While docker fails to run (e.g. Docker daemon is not running)
+       if [ "$attempt" -ge "$max_attempts" ]; then                    # If number of attempt exceeds the max_attempts then we exit
+              echo "Docker daemon is still not available. Exiting"
+              exit 1
+       fi
+       attempt=$((attempt+1))                                         # Increment the attempt count
+       sleep 2                                                        # Wait for few seconds before we check again
+done
+
+#####################################################################################
+#
+# Step 2. Stop and remove the EventStoreDB docker container if it is already running
+#
+#####################################################################################
+
+if docker inspect esdb-node > /dev/null 2>&1; then                            # If the EventStoreDB docker container (esdb-node) is running
+       echo -e 'EventStoreDB docker container appears to be running...';
+       echo -e 'Stopping and removing the EventStoreDB docker container...';
+
+       docker rm -f esdb-node > /dev/null 2>&1                                # Remove the docker container
 fi
 
-# Check to see if docker container is already running
-# If yes, kill it and restart
-# If no, download and start
-if docker ps -a --format '{{.Names}}'| grep -q esdb;
-then 
-       echo -e '\nesdb docker container appears to be running\n';
+################################################################################################################################################
+#
+# Step 3. Run the EventStoreDB docker container
+#
+# docker run                        # Start a new Docker container using the 'docker run' command
+#      -d \                         # Run the container in detached mode (in the background)
+#      --name esdb-node \           # Assign the container a name ('esdb-node' in this case)
+#      -p 2113:2113 \               # Map port 2113 on the host to port 2113 in the docker container. Required for the EventStoreDB Admin UI
+#      eventstore/eventstore:lts \  # Specify the Docker image to use, in this case, the EventStoreDB long-term support version (lts)
+#      --insecure \                 # Run EventStoreDB in insecure mode, without authentication and SSL/TLS security (usually for development)
+#      --run-projections=All \      # Enable all projections in EventStoreDB, including system and user projections
+#      --enable-atom-pub-over-http  # Enable the AtomPub API over HTTP. Required for the EventStoreDB Admin UI
+#
+################################################################################################################################################
 
-       # Kill the container
-       docker stop esdb-node
+echo -e 'Starting the EventStoreDB docker container...';
 
-       ## Remove the instance
-       docker rm esdb-node
+docker run \
+       -d \
+       --name esdb-node \
+       -p 2113:2113 \
+       eventstore/eventstore:lts \
+       --insecure \
+       --run-projections=All \
+       --enable-atom-pub-over-http
 
-       docker run -d --name esdb-node -it -p 2113:2113 -p 1113:1113 \
-              eventstore/eventstore:lts --insecure --run-projections=All \
-              --enable-external-tcp --enable-atom-pub-over-http
-
-else
-       docker run -d --name esdb-node -it -p 2113:2113 -p 1113:1113 \
-              eventstore/eventstore:lts --insecure --run-projections=All \
-              --enable-external-tcp --enable-atom-pub-over-http
+if ! docker inspect esdb-node > /dev/null 2>&1; then    # If the EventStoreDB docker container (esdb) is running, exit
+       echo "The EventStoreDB docker container is not running. Exiting."
+       exit 1
 fi
 
-# Grab URL to EventStoreDB Admin UI
-ESDB_URL=http://localhost:2113
-if [ "$CODESPACES" == "true" ]
-then
-       # Grab URL from github codespaces if script is ran from there
-       ESDB_URL=https://"$CODESPACE_NAME"-2113.$GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN
+######################################################################################
+#
+# Step 4. Print success message if EventStoreDB docker container started successfully
+#
+######################################################################################
+
+ESDB_URL=http://localhost:2113                                                            # Set default URL to localhost (for EventStoreDB started locally, not in Codespaces)
+if [ "$CODESPACES" == "true" ]; then                                                      # If this environment is Codespaces 
+       ESDB_URL=https://"$CODESPACE_NAME"-2113.$GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN  # Build the URL to forwarded github codespaces domain       
 fi
 
-# Print URL to EventStoreDB Admin UI
 echo ""
 echo ""
 echo -e "🚀 \e[32mEventStoreDB Server has started!!\e[0m 🚀" 
 echo ""
-echo -e "Browse the EventStoreDB Admin UI at 👉 \e[0m \e[34m$ESDB_URL\e[0m"
+echo -e "URL to EventStoreDB Admin UI 👉 \e[0m \e[34m$ESDB_URL\e[0m"                      # Print URL to EventStoreDB Admin UI
 echo ""
 echo ""

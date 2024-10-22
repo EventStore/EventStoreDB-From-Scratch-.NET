@@ -51,7 +51,7 @@ fi
 # docker run                        # Start a new Docker container using the 'docker run' command
 #      -d \                         # Run the container in detached mode (in the background)
 #      --name esdb-node \           # Assign the container a name ('esdb-node' in this case)
-#      -p 2113:2113 \               # Map port 2113 on the host to port 2113 in the docker container. Required for the EventStoreDB Admin UI
+#      -p 2113:2113 \               # Map port 2113 on the host to port 2113 in the docker container. Required for EventStoreDB
 #      eventstore/eventstore:lts \  # Specify the Docker image to use, in this case, the EventStoreDB long-term support version (lts)
 #      --insecure \                 # Run EventStoreDB in insecure mode, without authentication and SSL/TLS security (usually for development)
 #      --run-projections=All \      # Enable all projections in EventStoreDB, including system and user projections

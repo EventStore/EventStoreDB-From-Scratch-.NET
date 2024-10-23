@@ -17,11 +17,12 @@ await using var client = new EventStoreClient(settings);
 //
 /////////////////////////////////////////////////////////////
 
-var eventType = "SampleEventType";                              // Define the event type for the new event
-var eventData = new EventData(                                  // Create a new event with a type and body
-    Uuid.NewUuid(),                                             // Specify a new UUID for the event
-    eventType,                                                  // Specify the event type
-    @"{""id"": ""1"", ""value"": ""some value""}"u8.ToArray()   // Specify the event data body as a JSON in byte format
+var eventType = "SampleEventType";                   // Define the event type for the new event
+var eventData = new EventData(                       // Create a new event with a type and body
+    Uuid.NewUuid(),                                  // Specify a new UUID for the event
+    eventType,                                       // Specify the event type
+    @"{""id"": ""1"", ""value"": ""some value""}"u8  // Specify the event data body as JSON encoded with UTF8
+        .ToArray()                                   // Convert the body into a byte array
 );
 
 ///////////////////////////////////////////////////

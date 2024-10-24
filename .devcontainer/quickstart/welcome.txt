@@ -1,0 +1,6 @@
+Hello!👋 Welcome to the EventStoreDB Getting Started Quickstart Guide.
+
+To continue, please follow instructions in the quickstart guide found in https://developer.eventstore.com/getting-started/quickstart
+
+Enjoy!
+
